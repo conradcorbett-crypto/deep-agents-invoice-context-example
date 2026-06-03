@@ -20,7 +20,7 @@ The pattern uses **`context_schema`** at agent creation and **`context=`** at in
 ## Quick start
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/deep-agents-invoice-context-example.git
+git clone https://github.com/conradcorbett-crypto/deep-agents-invoice-context-example.git
 cd deep-agents-invoice-context-example
 
 cp .env.example .env
