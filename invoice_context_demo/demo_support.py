@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from langchain.agents.middleware import ModelRequest, dynamic_prompt
 from langchain.tools import ToolRuntime, tool
 from typing_extensions import TypedDict
 
@@ -83,6 +84,19 @@ class InvoiceContext(TypedDict):
     """Runtime context passed via ``context=`` at invoke time."""
 
     invoice_ids: list[str]
+
+
+@dynamic_prompt
+def invoice_scope_prompt(request: ModelRequest) -> str:
+    """Inject scoped invoice IDs from invoke-time ``context=`` into the system prompt."""
+    invoice_ids = request.runtime.context.get("invoice_ids", [])
+    ids_text = ", ".join(invoice_ids) if invoice_ids else "(none)"
+    return (
+        "You analyze invoices using the analyze_invoice tool. "
+        f"Scoped invoice IDs for this run (from runtime context, not the user message): "
+        f"{ids_text}. "
+        "Call analyze_invoice once per scoped ID, then summarize the results."
+    )
 
 
 @dataclass(frozen=True)
