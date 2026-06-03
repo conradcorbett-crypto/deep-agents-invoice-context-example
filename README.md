@@ -2,14 +2,15 @@
 
 This example shows how to pass structured business data (invoice IDs and metadata) into a [Deep Agent](https://docs.langchain.com/oss/python/deepagents/overview) **without** embedding it in the user message.
 
-The pattern uses **`context_schema`** at agent creation and **`context=`** at invoke time. Tools read scoped data from `runtime.context`. Context is immutable for the run and is **not** automatically injected into the model prompt — ideal for tenant IDs, scoped resource lists, credentials, and feature flags.
+The pattern uses **`context_schema`** at agent creation and **`context=`** at invoke time. Tools read scoped data from `runtime.context`. When the model must see scoped IDs (without putting them in the user message), **`@dynamic_prompt` middleware** reads the same runtime context at invoke time and builds the system prompt. Context is immutable for the run and is **not** automatically injected into the model prompt without middleware or tools.
 
 ## What this demo does
 
 1. Registers three fake invoices in an in-memory registry.
 2. Creates a Deep Agent with `context_schema=InvoiceContext`.
 3. Invokes the agent with a generic user message (`"Please analyze the attached invoices."`) and passes invoice IDs via `context={"invoice_ids": [...]}`.
-4. The `analyze_invoice` tool reads allowed IDs from `runtime.context` and returns structured analysis for each invoice.
+4. `invoice_scope_prompt` middleware injects scoped IDs from `context=` into the system prompt.
+5. The `analyze_invoice` tool reads allowed IDs from `runtime.context` and returns structured analysis for each invoice.
 
 ## Prerequisites
 
@@ -45,12 +46,24 @@ Open `invoice_context_demo.ipynb` in Cursor or VS Code and select the project **
 ## Core pattern
 
 ```python
+from langchain.agents.middleware import ModelRequest, dynamic_prompt
 from deepagents import create_deep_agent
+
+@dynamic_prompt
+def invoice_scope_prompt(request: ModelRequest) -> str:
+    invoice_ids = request.runtime.context.get("invoice_ids", [])
+    ids_text = ", ".join(invoice_ids) if invoice_ids else "(none)"
+    return (
+        "You analyze invoices using the analyze_invoice tool. "
+        f"Scoped invoice IDs for this run: {ids_text}. "
+        "Call analyze_invoice once per scoped ID, then summarize the results."
+    )
 
 agent = create_deep_agent(
     model=model,
     tools=[analyze_invoice],
     context_schema=InvoiceContext,  # TypedDict with invoice_ids: list[str]
+    middleware=[invoice_scope_prompt],
 )
 
 result = agent.invoke(
