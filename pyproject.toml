@@ -1,0 +1,20 @@
+[project]
+name = "invoice-context-demo"
+version = "0.1.0"
+description = "Example: passing structured invoice payloads via context= in Deep Agents"
+requires-python = ">=3.11"
+dependencies = [
+    "deepagents>=0.6.6",
+    "langchain>=1.3.4,<2.0.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.20.0",
+    "langchain-openai>=1.2.2",
+    "python-dotenv>=1.2.2",
+]
+
+[build-system]
+requires = ["setuptools>=73.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["invoice_context_demo"]
