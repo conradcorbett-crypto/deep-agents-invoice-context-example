@@ -69,7 +69,7 @@ def require_openai_api_key() -> None:
         "OPENAI_API_KEY is not set in this Jupyter kernel.",
         "Terminal exports are not passed to the notebook process.",
         "Create .env in this project root (see .env.example),",
-        "restart the kernel, then re-run the setup cell.",
+        "restart the kernel, then re-run the notebook cells.",
     ]
     if env_path is not None:
         lines.append(f"Found .env at {env_path} but OPENAI_API_KEY is empty or still the placeholder.")

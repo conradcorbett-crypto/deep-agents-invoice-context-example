@@ -26,17 +26,10 @@ cd deep-agents-invoice-context-example
 cp .env.example .env
 # Edit .env and set OPENAI_API_KEY=sk-...
 
-./scripts/setup_kernel.sh
-```
-
-Open `invoice_context_demo.ipynb` in Cursor or VS Code and select the **Python (invoice-context-demo)** kernel. Run all cells.
-
-### Manual setup
-
-```bash
 uv sync
-uv run python -m ipykernel install --user --name invoice-context-demo --display-name "Python (invoice-context-demo)"
 ```
+
+Open `invoice_context_demo.ipynb` in Cursor or VS Code and select the project **`.venv`** Python interpreter. Run all cells.
 
 ## Environment variables
 
